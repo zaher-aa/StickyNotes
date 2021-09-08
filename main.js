@@ -5,8 +5,9 @@ const app = () => {
   let tasksCount = document.querySelector(".tasks-count");
   let comletedCount = document.querySelector(".completion-count");
   let task;
+
   // Add A Task
-  addBtn.onclick = function () {
+  function runApp() {
     let addableText = input.value;
 
     // Check if the user has written something or not, if yes then add whatever he written otherwise do nothing
@@ -46,8 +47,11 @@ const app = () => {
       // Remove all letters from the input field after adding the task
       input.value = "";
 
-      // Increase the tasks count by one every time a task is added
+      // Increase the tasks count by one every time a new task is added
       tasksCount.innerHTML++;
+
+      // Make input field in focus mode every time a new task is added
+      input.focus();
 
       // Delete a task
       delElement.onclick = function () {
@@ -64,13 +68,21 @@ const app = () => {
       alert("You Should Write Something IN Order To Add It To The List.");
     }
 
-    // Check a task
+    // Finish a task
     task.onclick = function () {
       this.classList.toggle("done");
       comletedCount.innerHTML =
         document.querySelectorAll(".all-tasks .done").length;
     };
-  };
+  }
+
+  // Run the app when the key "Enter" is pressed.
+  input.addEventListener("keydown", (e) => {
+    if (e.keyCode === 13) runApp();
+  });
+
+  // Run the app when the "Button" is clicked.
+  addBtn.onclick = () => runApp();
 };
 
 app();
