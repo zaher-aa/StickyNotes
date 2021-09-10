@@ -42,7 +42,7 @@ const app = () => {
       task.appendChild(delElement);
 
       // Append task to tatasksParentsk
-      tasksParent.appendChild(task);
+      tasksParent.insertBefore(task, tasksParent.firstElementChild);
 
       // Remove all letters from the input field after adding the task
       input.value = "";
