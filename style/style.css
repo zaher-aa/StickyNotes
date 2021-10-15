@@ -17,11 +17,11 @@ main {
   background-color: white;
 }
 
-main .input-holder {
+main form {
   position: relative;
 }
 
-main .input-holder button {
+main form input[type="submit"] {
   border: none;
   user-select: none;
   position: absolute;
@@ -49,8 +49,8 @@ main .input-holder button {
   -o-transition: transform 0.3s;
 }
 
-main .input-holder button:hover,
-main .input-holder button:focus {
+main form input[type="submit"]:hover,
+main form input[type="submit"]:focus {
   transform: rotate(90deg);
   -webkit-transform: rotate(90deg);
   -moz-transform: rotate(90deg);
@@ -59,13 +59,13 @@ main .input-holder button:focus {
   outline: none;
 }
 
-main .input-holder button:active {
+main form input[type="submit"]:active {
   color: white;
   background-color: #b15353;
   border: 2px solid white;
 }
 
-main input {
+main input:not([type="submit"]) {
   width: 100%;
   border: none;
   background-color: #4cb6ac;
@@ -78,41 +78,40 @@ main input {
   font-weight: 600;
 }
 
-main .all-tasks {
+main .tasks {
   width: 100%;
   border: 25px solid #eee;
   margin-bottom: 10px;
-}
-
-main .all-tasks span {
-  padding: 15px 10px;
-  color: #777;
+  color: #333;
   font-size: 1.3rem;
-  display: block;
 }
 
-main .all-tasks .task {
+main .tasks > span {
+  display: block;
+  padding: 15px;
+}
+
+main .tasks .task {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20px 10px;
   cursor: pointer;
-}
-
-main .all-tasks .task.done .text {
-  text-decoration: line-through;
-}
-
-main .all-tasks .task:not(:last-child) {
-  border-bottom: 20px solid #eee;
-}
-
-main .all-tasks .task .text {
   font-size: 1.5rem;
   word-break: break-all;
 }
 
-main .all-tasks .task .delete {
+main .tasks .task.done span {
+  text-decoration: line-through;
+}
+
+main .tasks .task:not(:last-child) {
+  border-bottom: 20px solid #eee;
+}
+
+button {
+  text-decoration: none;
+  font-size: 1rem;
   flex-shrink: 0;
   margin-left: 10px;
   border: none;
@@ -122,7 +121,7 @@ main .all-tasks .task .delete {
   background-color: #ea1f63;
   font-weight: bold;
   color: white;
-  padding: 7px 10px;
+  padding: 5px 10px;
   border-radius: 7px;
   -webkit-border-radius: 7px;
   -moz-border-radius: 7px;
@@ -138,7 +137,7 @@ main .all-tasks .task .delete {
   z-index: 1;
 }
 
-main .all-tasks .task .delete::after {
+button::after {
   position: absolute;
   content: "";
   width: 1px;
@@ -158,15 +157,15 @@ main .all-tasks .task .delete::after {
   -o-border-radius: 50%;
 }
 
-main .all-tasks .task .delete:hover::after,
-main .all-tasks .task .delete:focus::after {
+button:hover::after,
+button:focus::after {
   box-shadow: 0 0 0 100px #a00620;
 }
 
 main .count {
   width: 100%;
   background-color: #eee;
-  padding: 30px 20px;
+  padding: 25px 20px;
   font-size: 1.3rem;
   display: flex;
   align-items: center;
@@ -214,4 +213,27 @@ footer a {
 
 footer:hover {
   background-color: #eeeeee;
+}
+
+#delete-all {
+  margin: 0;
+}
+
+#delete-all:not(.active) {
+  padding: 7px 10px;
+  font-size: 1rem;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@media (max-width: 455px) {
+  main .count {
+    display: block;
+    text-align: center;
+  }
+
+  main .count > *:not(:last-child),
+  #delete-all {
+    margin-bottom: 20px;
+  }
 }

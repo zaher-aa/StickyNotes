@@ -1,88 +1,141 @@
-const app = () => {
-  const input = document.querySelector("main .input-holder input");
-  const addBtn = document.querySelector("main .input-holder button");
-  const tasksParent = document.querySelector("main .all-tasks");
-  let tasksCount = document.querySelector(".tasks-count");
-  let comletedCount = document.querySelector(".completion-count");
-  let task;
+const stickyNotes = () => {
+  const form = document.forms[0];
+  const inputField = document.getElementById("input-field");
+  const tasksWrapper = document.querySelector(".tasks");
+  const tasksCount = document.querySelector(".tasks-count");
+  const completedTasks = document.querySelector(".completion-count");
+  const deleteAll = document.getElementById("delete-all");
+  let randomIdNumber;
 
-  // Add A Task
-  function runApp() {
-    let addableText = input.value;
+  if (localStorage.Tasks) renderElements(false, JSON.parse(localStorage.Tasks));
+  if (localStorage.tasksCount) tasksCount.textContent = localStorage.tasksCount;
+  if (localStorage.completedTasks)
+    completedTasks.textContent = localStorage.completedTasks;
+  if (localStorage.delActive === "active") deleteAll.classList.add("active");
 
-    // Check if the user has written something or not, if yes then add whatever he written otherwise do nothing
-    if (addableText.trim().length > 0) {
-      // If the "No Tasks To Show 'span'" element exists then remove it otherwise do nothing
-      if (document.querySelector(".all-tasks span")) {
-        document.querySelector(".all-tasks span").remove();
-      }
-      // Create task
-      task = document.createElement("div");
-      task.className = "task";
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    if (inputField.value.trim() === "") return;
+    randomIdNumber = Date.now();
+    renderElements(true);
+    addToLocalStorage();
+  };
 
-      // Create textElement
-      let textElement = document.createElement("div");
-      textElement.className = "text";
-
-      // Create delElement
-      let delElement = document.createElement("button");
-      delElement.className = "delete";
-
-      // Create textElementText
-      let textElementText = document.createTextNode(addableText);
-      textElement.appendChild(textElementText);
-
-      // Create delElementText
-      let delElementText = document.createTextNode("Delete");
-      delElement.appendChild(delElementText);
-
-      // Append textElement to task
-      task.appendChild(textElement);
-      // Append delElement to task
-      task.appendChild(delElement);
-
-      // Append task to tatasksParentsk
-      tasksParent.insertBefore(task, tasksParent.firstElementChild);
-
-      // Remove all letters from the input field after adding the task
-      input.value = "";
-
-      // Increase the tasks count by one every time a new task is added
-      tasksCount.innerHTML++;
-
-      // Make input field in focus mode every time a new task is added
-      input.focus();
-
-      // Delete a task
-      delElement.onclick = function () {
-        this.parentElement.remove();
-        tasksCount.innerHTML--;
-        if (tasksParent.childElementCount === 0) {
-          let noTasks = document.createElement("span");
-          let noTasksText = document.createTextNode("No Tasks To Show");
-          noTasks.appendChild(noTasksText);
-          tasksParent.appendChild(noTasks);
-        }
-      };
-    } else {
-      alert("You Should Write Something IN Order To Add It To The List.");
+  // Update DOM and Locale Storage
+  document.addEventListener("click", (e) => {
+    if (!e.target.matches("#delete, .task") && !e.target.matches(".task span"))
+      return;
+    if (e.target.matches("#delete")) {
+      e.target.parentElement.remove();
+      tasksCount.textContent--;
     }
-
-    // Finish a task
-    task.onclick = function () {
-      this.classList.toggle("done");
-      comletedCount.innerHTML =
-        document.querySelectorAll(".all-tasks .done").length;
-    };
-  }
-
-  // Run the app when the key "Enter" is pressed.
-  input.addEventListener("keydown", (e) => {
-    if (e.keyCode === 13) runApp();
+    if (e.target.matches(".task")) e.target.classList.toggle("done");
+    else e.target.parentElement.classList.toggle("done");
+    updateLocalStorage();
   });
 
-  // Run the app when the "Button" is clicked.
-  addBtn.onclick = () => runApp();
+  // Delete All Function
+  deleteAll.addEventListener("click", (e) => {
+    if (e.currentTarget.classList.contains("active")) {
+      tasksWrapper.innerHTML = "";
+      let span = document.createElement("span");
+      span.append(document.createTextNode("No Tasks To Show"));
+      tasksWrapper.append(span);
+      tasksCount.textContent = 0;
+      completedTasks.textContent = 0;
+      localStorage.clear();
+      e.currentTarget.classList.remove("active");
+    }
+  });
+
+  // Render Elements Function
+  function renderElements(newElement, elements) {
+    if (tasksWrapper.children[0].tagName === "SPAN")
+      tasksWrapper.children[0].remove();
+    // Add a new element to the DOM.
+    if (newElement) {
+      let task = document.createElement("div");
+      task.className = "task";
+      task.setAttribute("data-id", randomIdNumber);
+      let span = document.createElement("span");
+      span.textContent = inputField.value;
+      let del = document.createElement("button");
+      del.id = "delete";
+      del.textContent = "Delete";
+      task.append(span, del);
+      tasksWrapper.append(task);
+      tasksCount.textContent++;
+      updateLocalStorage(true);
+      return;
+    }
+    // Render elements which are stored in the localStorage.
+    elements.forEach((el) => {
+      let task = document.createElement("div");
+      task.classList.add("task");
+      task.setAttribute("data-id", el.id);
+      if (el.done) task.classList.add("done");
+      let span = document.createElement("span");
+      span.textContent = el.title;
+      let del = document.createElement("button");
+      del.id = "delete";
+      del.textContent = "Delete";
+      task.append(span, del);
+      tasksWrapper.append(task);
+    });
+  }
+
+  function addToLocalStorage() {
+    let currentTask = {
+      id: randomIdNumber,
+      title: inputField.value,
+      done: false,
+    };
+    inputField.value = "";
+    if (localStorage.Tasks) {
+      localStorage.setItem(
+        "Tasks",
+        JSON.stringify([...JSON.parse(localStorage.Tasks), currentTask])
+      );
+    } else {
+      localStorage.setItem("Tasks", JSON.stringify([currentTask]));
+    }
+  }
+
+  function updateLocalStorage(newElement) {
+    let num = 0;
+    let updatedTasks = [...tasksWrapper.children].map((task) => {
+      return {
+        id: +task.getAttribute("data-id"),
+        title: task.firstChild.textContent,
+        done: task.classList.contains("done"),
+      };
+    });
+    if (updatedTasks.length !== 0) {
+      if (newElement) num = 1;
+      localStorage.setItem(
+        "Tasks",
+        JSON.stringify(updatedTasks.slice(0, updatedTasks.length - num))
+      );
+    } else {
+      localStorage.removeItem("Tasks");
+      let span = document.createElement("span");
+      span.append(document.createTextNode("No Tasks To Show"));
+      tasksWrapper.append(span);
+    }
+    completedTasks.textContent = [...tasksWrapper.children].reduce(
+      (acc, cur) => (cur.classList.contains("done") ? acc + 1 : acc),
+      0
+    );
+    localStorage.setItem("tasksCount", +tasksCount.textContent);
+    localStorage.setItem("completedTasks", completedTasks.textContent);
+    if (+tasksCount.textContent > 0) {
+      deleteAll.classList.add("active");
+      localStorage.setItem("delActive", "active");
+    } else {
+      deleteAll.classList.remove("active");
+      localStorage.removeItem("delActive");
+    }
+  }
 };
 
-app();
+stickyNotes();

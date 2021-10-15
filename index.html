@@ -21,18 +21,19 @@
   </head>
   <body>
     <main class="app">
-      <div class="input-holder">
-        <input type="text" name="task" autofocus />
-        <button>+</button>
-      </div>
-      <div class="all-tasks">
+      <form action="">
+        <input type="text" id="input-field" autofocus />
+        <input type="submit" value="+" />
+      </form>
+      <section class="tasks">
         <span>No Tasks To Show</span>
-      </div>
+      </section>
       <div class="count">
-        <div class="tasks">
+        <div class="all-tasks">
           <span class="text">Tasks</span>
           <span class="tasks-count">0</span>
         </div>
+        <button id="delete-all">Delete All</button>
         <div class="completed">
           <span class="text">Completed</span>
           <span class="completion-count">0</span>
